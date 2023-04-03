@@ -3,7 +3,7 @@ Adds FHEM support to OctoPrint-PSUControl as a sub-plugin
 
 ## Setup
 - Install the plugin using
-  `pip install "https://github.com/nils-a/OctoPrint-PSUControl-FHEM/archive/main.zip"`
+  `pip install "https://github.com/nils-org/OctoPrint-PSUControl-FHEM/archive/main.zip"`
 - Configure this plugin
 - Select this plugin as a Switching and/or Sensing method in [PSU Control](https://github.com/kantlivelong/OctoPrint-PSUControl)
 

@@ -9,8 +9,8 @@ plugin_name = "OctoPrint-PSUControl-FHEM"
 plugin_version = "0.0.1"
 plugin_description = "Adds FHEM support to OctoPrint-PSUControl as a sub-plugin"
 plugin_author = "Nils Andresen"
-plugin_author_email = "nils@nils-andresen.de"
-plugin_url = "https://github.com/nils-a/OctoPrint-PSUControl-FHEM"
+plugin_author_email = "nils@nils-orgndresen.de"
+plugin_url = "https://github.com/nils-org/OctoPrint-PSUControl-FHEM"
 plugin_license = "AGPLv3"
 plugin_additional_data = []
 

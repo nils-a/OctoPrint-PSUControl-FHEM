@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import
 
-__author__ = "Nils Andresen <Nils@Nils-Andresen.de>"
+__author__ = "Nils Andresen <Nils@nils-orgndresen.de>"
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
 __copyright__ = "Copyright (C) 2023 Nils Andresen - Released under terms of the AGPLv3 License"
 
@@ -98,12 +98,12 @@ class PSUControl_FHEM(octoprint.plugin.StartupPlugin,
 
                 # version check: github repository
                 type="github_release",
-                user="nils-a",
+                user="nils-org",
                 repo="OctoPrint-PSUControl-FHEM",
                 current=self._plugin_version,
 
                 # update method: pip w/ dependency links
-                pip="https://github.com/nils-a/OctoPrint-PSUControl-FHEM/archive/{target_version}.zip"
+                pip="https://github.com/nils-org/OctoPrint-PSUControl-FHEM/archive/{target_version}.zip"
             )
         )
 
