@@ -1,11 +1,12 @@
 # coding=utf-8
 from __future__ import absolute_import
 
-__author__ = "Nils Andresen <Nils@nils-orgndresen.de>"
+__author__ = "Nils Andresen <Nils@nils-andresen.de>"
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
 __copyright__ = "Copyright (C) 2023 Nils Andresen - Released under terms of the AGPLv3 License"
 
 import octoprint.plugin
+import requests
 
 class PSUControl_FHEM(octoprint.plugin.StartupPlugin,
                         octoprint.plugin.RestartNeedingPlugin,
@@ -15,17 +16,24 @@ class PSUControl_FHEM(octoprint.plugin.StartupPlugin,
     def __init__(self):
         self.config = dict()
         self.mockPower = False
+        self.csrf = None
 
 
     def get_settings_defaults(self):
         return dict(
             address = '',
-            plug = 0
+            device_name = '',
+            verify_tls = False,
+            set_on = 'on',
+            set_off = 'off',
+            reading = 'state'
         )
 
 
     def on_settings_initialized(self):
+        self.config = dict()
         self.reload_settings()
+        self.load_csrf()
 
 
     def reload_settings(self):
@@ -51,6 +59,7 @@ class PSUControl_FHEM(octoprint.plugin.StartupPlugin,
 
         self._logger.debug("Registering plugin with PSUControl")
         psucontrol_helpers['register_plugin'](self)
+        self.load_csrf()
 
 
     def get_sysinfo(self):
@@ -64,16 +73,76 @@ class PSUControl_FHEM(octoprint.plugin.StartupPlugin,
             return dict()
 
     def turn_psu_on(self):
+        if(not self.config['address']):
+             return
+
         self._logger.debug("Switching PSU On")
-        self.mockPower = True
+        self.send_to_fhem('set {0} {1}'.format(self.config['device_name'], self.config['set_on']))
 
     def turn_psu_off(self):
+        if(not self.config['address']):
+             return
+
         self._logger.debug("Switching PSU Off")
-        self.mockPower = False
+        self.send_to_fhem('set {0} {1}'.format(self.config['device_name'], self.config['set_off']))
 
     def get_psu_state(self):
+        if(not self.config['address']):
+            return False
+
         self._logger.debug("get_psu_state")
-        return self.mockPower
+        resp = self.send_to_fhem('jsonlist2 {0}'.format(self.config['device_name']))
+        list = resp.json()
+        if(list is None):
+            self._logger.warn('Error getting list data.')
+            self._logger.debug(resp.content)
+            return False
+
+        val = list['Results'][0]['Readings'][self.config['reading']]['Value']
+        self._logger.debug('{0} from readings is: {1}'.format(self.config['reading'], val))
+        if(val == self.config['set_off']):
+            return False
+        elif(val == self.config['set_on']):
+            return True
+        elif(val.startswith('set_')):
+            self._logger.debug('device is being changed, currently')
+            return False # rather 'unknown' or 'unchanged'
+        else:
+            self._logger.error('unknown status in reading: {0}'.format(val))
+            return False
+
+    def send_to_fhem(self, command, recurse=False):
+        url='{0}/fhem'.format(self.config['address'])
+        verify_tls=self.config['verify_tls']
+        auth=None
+        params={
+            'cmd':command,
+            'XHR':1,
+            'fwcsrf': self.csrf
+        }
+        args={
+            'verify': verify_tls,
+            'auth': auth,
+        }
+
+        self._logger.debug('sending command \'{0}\' to server {1}'.format(command, url))
+        resp = requests.get(url, params=params, **args)
+        if(resp.status_code == 400 and resp.headers['X-FHEM-csrfToken'] != self.csrf and not recurse):
+            # csrf error.
+            self._logger.debug('encountered new CSRF')
+            self.csrf = resp.headers['X-FHEM-csrfToken']
+            return self.send_to_fhem(command, True)
+
+        if(not resp.ok):
+            self._logger.error('got status {0} when accessing {1}'.format(resp.status_code, url))
+
+        self.csrf = resp.headers['X-FHEM-csrfToken']
+        return resp
+
+    def load_csrf(self):
+        if(not self.config['address']):
+            return
+        self.send_to_fhem('jsonlist2 {0}'.format(self.config['device_name']))
 
     def on_settings_save(self, data):
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)

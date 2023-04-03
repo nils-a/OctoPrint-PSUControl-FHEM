@@ -2,12 +2,63 @@
 <span class="help-inline label label-important">This plugin requires <a href="https://plugins.octoprint.org/plugins/psucontrol/" target="_blank">PSU Control</a> in order to function. It can be installed from the Plugin Manager.</span>
 <!-- /ko -->
 
+<!-- ko if: settings.plugins.psucontrol && !(settings.plugins.psucontrol.switchingMethod() === "PLUGIN" && settings.plugins.psucontrol.switchingPlugin() === "psucontrol_fhem") -->
+    <span class="help-inline label label-important">Please set the switching method to <b>PLUGIN</b> and the switching plugin to <b>PSU Control - FHEM</b> in the PSU Control settings to use this plugin.</span>
+<!-- /ko -->
+<!-- ko if: settings.plugins.psucontrol && !(settings.plugins.psucontrol.sensingMethod() === "PLUGIN" && settings.plugins.psucontrol.sensingPlugin() === "psucontrol_fhem") -->
+    <span class="help-block label label-important">Please set the sensing method to <b>PLUGIN</b> and the sensing plugin to <b>PSU Control - FHEM</b> in the PSU Control settings to use this plugin.</span>
+<!-- /ko -->
+
 <form class="form-horizontal">
     <h4>General</h4>
     <div class="control-group">
-        <label class="control-label">FHEM</label>
+        <label class="control-label">Server</label>
         <div class="controls">
-            <input type="text" class="input" data-bind="value: settings.plugins.psucontrol_fhem.address" placeholder="server">
+            <input type="text" class="input" data-bind="value: settings.plugins.psucontrol_fhem.address" placeholder="http://localhost:8083">
+            <span class="help-block">The IP address or hostname of your FHEM server. e.g. http://ip:port or http://hostname:port. Do not include a trailing slash /</span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Device Name</label>
+        <div class="controls">
+            <input type="text" class="input" data-bind="value: settings.plugins.psucontrol_fhem.device_name">
+            <span class="help-block">The device Name in FHEM.</span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Set ON value</label>
+        <div class="controls">
+            <input type="text" class="input" data-bind="value: settings.plugins.psucontrol_fhem.set_on" placeholder="on">
+            <span class="help-block">The option to set the device to for the ON status.</span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Set OFF value</label>
+        <div class="controls">
+            <input type="text" class="input" data-bind="value: settings.plugins.psucontrol_fhem.set_off"  placeholder="off">
+            <span class="help-block">he option to set the device to for the OFF status.</span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">Reading</label>
+        <div class="controls">
+            <input type="text" class="input" data-bind="value: settings.plugins.psucontrol_fhem.reading"  placeholder="state">
+            <span class="help-block">The reading to compare to the ON or OFF value for status requests.</span>
+        </div>
+    </div>
+    <!-- todo: authentication -->
+    <div class="control-group">
+        <div class="controls">
+            <label class="checkbox">
+                <input type="checkbox" data-bind="checked: settings.plugins.psucontrol_fhem.verify_tls">
+                Verify TLS certificates
+            </label>
+            <!-- ko if: settings.plugins.psucontrol_fhem.verify_tls -->
+            <span class="help-block">Verify TLS certificate and do not connect on certificate issues.</span>
+            <!-- /ko -->
+            <!-- ko ifnot: settings.plugins.psucontrol_fhem.verify_tls -->
+            <span class="help-block">Do not verify TLS certificate.</span>
+            <!-- /ko -->
         </div>
     </div>
 </form>
