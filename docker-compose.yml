@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: dev.dockerfile
+    volumes:
+      - 'octoprint-dev:/home/dev/.octoprint'
+      - '.:/home/dev/OctoPrint-PSUControl-FHEM'
+    working_dir: /home/dev/OctoPrint-PSUControl-FHEM
+    entrypoint: ["bash", "-c", "octoprint dev plugin:install && octoprint serve"]
+    ports:
+      - '127.0.0.1:8080:5000'
+    profiles:
+      - dev
+
+volumes:
+  octoprint-dev:
