@@ -6,7 +6,7 @@ import setuptools
 plugin_identifier = "psucontrol_fhem"
 plugin_package = "octoprint_%s" % plugin_identifier
 plugin_name = "OctoPrint-PSUControl-FHEM"
-plugin_version = "0.0.1"
+plugin_version = "0.1.0"
 plugin_description = "Adds FHEM support to OctoPrint-PSUControl as a sub-plugin"
 plugin_author = "Nils Andresen"
 plugin_author_email = "nils@nils-andresen.de"
